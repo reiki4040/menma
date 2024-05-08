@@ -1,4 +1,4 @@
-menma
+msk
 ===
 
 assume-role helper.
@@ -6,14 +6,14 @@ assume-role helper.
 ## installation
 
 ```
-brew install reiki4040/tap/menma
+brew install reiki4040/tap/msk
 ```
 
 ## usage
 
 assume role to `<profile>` and show temporary credentials
 ```
-menma <profile>
+msk <profile>
 ```
 
 ```
@@ -28,7 +28,7 @@ export AWS_PROFILE="<target profile>"
 
 set credentials to current shell (ex. bash, zsh)
 ```
-eval $(menma <profile>)
+eval $(msk <profile>)
 ```
 
 ### example
@@ -50,18 +50,18 @@ mfa_serial = arn:aws:iam::<account id>:mfa/<user name>
 
 assume role to `dev` profile from `default` profile.
 ```
-menma dev
+msk dev
 ```
 
 assume role to `admin` profile from `default` profile with MFA (auto detect from profile setting)
 ```
-menma other
+msk other
 MFA code: 
 ```
 
 set temporary `dev` credentials to current shell 
 ```
-eval $(menma dev)
+eval $(msk dev)
 ```
 
 assume role check with `aws cli` after `eval`
@@ -71,8 +71,8 @@ aws sts get-caller-identity
 
 ```
 {
-    "UserId": "<ID>:via-menma",
+    "UserId": "<ID>:via-msk",
     "Account": "<account id>",
-    "Arn": "arn:aws:sts::<account id>:assumed-role/<assumed role>/via-menma"
+    "Arn": "arn:aws:sts::<account id>:assumed-role/<assumed role>/via-msk"
 }
 ```
