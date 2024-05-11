@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"context"
 	"flag"
 	"fmt"
@@ -152,10 +151,16 @@ func main() {
 	fmt.Printf("# this temporary credentials expire at %s\n", expire)
 }
 
+/*
+Why does NOT use stscreds.StdinTokenProiver()?
+https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/credentials/stscreds#StdinTokenProvider
+stscreds.StdinTokenProiver() shows prompt to Stdout.
+use stderr because assuming that the result will be eval().
+*/
 func readTokenCode() (string, error) {
-	r := bufio.NewReader(os.Stdin)
+	var mfaCode string
 	fmt.Fprintf(os.Stderr, "MFA code: ")
-	mfaCode, err := r.ReadString('\n')
+	_, err := fmt.Scanln(&mfaCode)
 	if err != nil {
 		return "", err
 	}
