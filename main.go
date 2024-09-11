@@ -22,6 +22,7 @@ var (
 	optUsage         bool
 	optSourceProfile string
 	optDuration      time.Duration
+	optFormatEnv     bool
 )
 
 func init() {
@@ -29,6 +30,7 @@ func init() {
 	flag.DurationVar(&optDuration, "d", time.Hour, "duration seconds for session expire")
 	flag.BoolVar(&optUsage, "h", false, "show usage.")
 	flag.BoolVar(&optUsage, "help", false, "show usage.")
+	flag.BoolVar(&optFormatEnv, "format-env", false, "output format `K=V`")
 	flag.Parse()
 }
 
@@ -45,6 +47,7 @@ you can set temporary assume role credentials to current zsh/bash.
 
   assume role to profile and show credential export.
 
+  # for eval, zshrc or bashrc
   msk <profile>
 
     export AWS_ACCESS_KEY_ID="<temporary credential>"
@@ -53,6 +56,17 @@ you can set temporary assume role credentials to current zsh/bash.
     export AWS_SECURITY_TOKEN="<temporary credential>"
     export ASSUMED_ROLE="<assumed role arn>"
     export AWS_PROFILE="<target profile>"
+    # this temporary credentials expire at YYYY-MM-DDTHH:mm:ss
+
+  # for .env file
+  msk -format-env <profile>
+
+    AWS_ACCESS_KEY_ID="<temporary credential>"
+    AWS_SECRET_ACCESS_KEY="<temporary credential>"
+    AWS_SESSION_TOKEN="<temporary credential>"
+    AWS_SECURITY_TOKEN="<temporary credential>"
+    ASSUMED_ROLE="<assumed role arn>"
+    AWS_PROFILE="<target profile>"
     # this temporary credentials expire at YYYY-MM-DDTHH:mm:ss
 
 [Optoins]
@@ -142,13 +156,23 @@ func main() {
 	assumedRole := *resp.AssumedRoleUser.Arn
 	expire := resp.Credentials.Expiration.Format(time.RFC3339)
 
-	fmt.Printf("export AWS_ACCESS_KEY_ID=\"%s\"\n", AwsKey)
-	fmt.Printf("export AWS_SECRET_ACCESS_KEY=\"%s\"\n", AwsSecret)
-	fmt.Printf("export AWS_SESSION_TOKEN=\"%s\"\n", AwsSessionToken)
-	fmt.Printf("export AWS_SECURITY_TOKEN=\"%s\"\n", AwsSessionToken)
-	fmt.Printf("export ASSUMED_ROLE=\"%s\"\n", assumedRole)
-	fmt.Printf("export AWS_PROFILE=\"%s\"\n", targetProfile)
-	fmt.Printf("# this temporary credentials expire at %s\n", expire)
+	if optFormatEnv {
+		fmt.Printf("AWS_ACCESS_KEY_ID=\"%s\"\n", AwsKey)
+		fmt.Printf("AWS_SECRET_ACCESS_KEY=\"%s\"\n", AwsSecret)
+		fmt.Printf("AWS_SESSION_TOKEN=\"%s\"\n", AwsSessionToken)
+		fmt.Printf("AWS_SECURITY_TOKEN=\"%s\"\n", AwsSessionToken)
+		fmt.Printf("ASSUMED_ROLE=\"%s\"\n", assumedRole)
+		fmt.Printf("AWS_PROFILE=\"%s\"\n", targetProfile)
+		fmt.Printf("# this temporary credentials expire at %s\n", expire)
+	} else {
+		fmt.Printf("export AWS_ACCESS_KEY_ID=\"%s\"\n", AwsKey)
+		fmt.Printf("export AWS_SECRET_ACCESS_KEY=\"%s\"\n", AwsSecret)
+		fmt.Printf("export AWS_SESSION_TOKEN=\"%s\"\n", AwsSessionToken)
+		fmt.Printf("export AWS_SECURITY_TOKEN=\"%s\"\n", AwsSessionToken)
+		fmt.Printf("export ASSUMED_ROLE=\"%s\"\n", assumedRole)
+		fmt.Printf("export AWS_PROFILE=\"%s\"\n", targetProfile)
+		fmt.Printf("# this temporary credentials expire at %s\n", expire)
+	}
 }
 
 /*
