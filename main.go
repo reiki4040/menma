@@ -7,7 +7,10 @@ import (
 	"log"
 	"os"
 	"strings"
+	"syscall"
 	"time"
+
+	"golang.org/x/term"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
@@ -158,11 +161,11 @@ stscreds.StdinTokenProiver() shows prompt to Stdout.
 use stderr because assuming that the result will be eval().
 */
 func readTokenCode() (string, error) {
-	var mfaCode string
 	fmt.Fprintf(os.Stderr, "MFA code: ")
-	_, err := fmt.Scanln(&mfaCode)
+	mfaCodeBytes, err := term.ReadPassword(int(syscall.Stdin))
 	if err != nil {
 		return "", err
 	}
-	return strings.TrimSpace(mfaCode), nil
+
+	return strings.TrimSpace(string(mfaCodeBytes)), nil
 }
